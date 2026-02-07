@@ -1,0 +1,62 @@
+# CRLC 默认配置文件
+
+# 环境设置
+env:
+  name: "antmaze-medium-diverse-v2" # D4RL 环境名
+  seed: 42
+
+# 编码器网络配置
+encoder:
+  state_hidden_dim: 256
+  action_hidden_dim: 128
+  fusion_hidden_dim: 256
+  representation_dim: 128 # z_phi 的维度
+  projection_dim: 64 # 投影头输出维度
+  activation: "relu"
+
+# 对比学习配置
+contrastive:
+  temperature: 0.1 # InfoNCE 温度参数
+  trajectory_window: 5 # 正样本轨迹窗口大小
+  num_negatives: 256 # 每个正样本的负样本数量
+  pretrain_steps: 50000 # 预训练步数
+  pretrain_batch_size: 256
+  pretrain_lr: 3e-4
+
+# 分布建模配置
+distribution:
+  update_freq: 1000 # 分布参数更新频率
+  percentile: 95 # 距离阈值百分位数
+  regularization: 1e-6 # 协方差矩阵正则化
+
+# SAC 配置
+sac:
+  actor_lr: 3e-4
+  critic_lr: 3e-4
+  alpha_lr: 3e-4
+  gamma: 0.99
+  tau: 0.005 # 目标网络软更新系数
+  hidden_dim: 256
+  auto_alpha: true # 自动调节温度参数
+  init_alpha: 0.2
+
+# 自适应保守惩罚配置
+conservative:
+  beta_min: 0.1 # 最小惩罚权重
+  beta_max: 5.0 # 最大惩罚权重
+  distance_scale: 1.0 # 距离缩放因子
+
+# 训练配置
+training:
+  total_steps: 1000000 # 总训练步数
+  batch_size: 256
+  eval_freq: 5000 # 评估频率
+  eval_episodes: 10 # 每次评估的回合数
+  log_freq: 1000 # 日志记录频率
+  save_freq: 50000 # 模型保存频率
+
+# 日志与保存
+logging:
+  log_dir: "./logs"
+  save_dir: "./checkpoints"
+  use_tensorboard: true

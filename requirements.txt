@@ -1,0 +1,24 @@
+# CRLC: Contrastive Representation Learning for Conservative Offline RL
+# 依赖环境
+
+# 核心依赖
+torch>=1.12.0
+numpy>=1.21.0
+gym>=0.23.0
+
+# D4RL 离线数据集
+d4rl>=1.1
+
+# MuJoCo 物理引擎
+mujoco>=2.3.0
+
+# 实用工具
+tqdm>=4.64.0
+tensorboard>=2.10.0
+matplotlib>=3.5.0
+seaborn>=0.12.0
+scikit-learn>=1.0.0
+
+# 配置管理
+omegaconf>=2.2.0
+hydra-core>=1.2.0
