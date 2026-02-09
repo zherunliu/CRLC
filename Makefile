@@ -12,6 +12,12 @@ feat: ## Introduce new features
 	git commit -m "feat: Introduce new features"
 	git push origin main
 
+.PHONY: generate
+generate: ## Generate images/logs
+	git add -A
+	git commit -m "generate: Generate images/logs"
+	git push origin main
+
 .PHONY: fix
 fix: ## Fix some bugs
 	git add -A
