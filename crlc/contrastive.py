@@ -9,6 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from typing import Tuple, Optional, List
+# from encoder import JointEncoder # for mini test
 from .encoder import JointEncoder
 
 
