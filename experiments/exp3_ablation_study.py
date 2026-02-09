@@ -17,7 +17,6 @@ import sys
 import argparse
 import json
 import numpy as np
-import torch
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

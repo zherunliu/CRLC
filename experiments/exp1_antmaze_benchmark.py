@@ -35,7 +35,6 @@ def run_single_experiment(
     save_dir: str = "./results/antmaze",
 ):
     """运行单个实验"""
-    import torch
     from train_crlc import train_crlc
 
     # 创建保存目录
