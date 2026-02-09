@@ -13,7 +13,7 @@ pip install -r requirements.txt
 pip install git+https://github.com/Farama-Foundation/d4rl@master#egg=d4rl
 ```
 
-## mini-test
+### mini-test
 
 ```bash
 # -m module
