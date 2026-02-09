@@ -1,14 +1,8 @@
- """
-CRLC-SAC 算法实现
-基于表征距离的自适应保守策略优化
-对应论文第3.3节
-"""
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from typing import Tuple, Dict, Optional
+from typing import Tuple, Dict
 import copy
 
 from .encoder import JointEncoder

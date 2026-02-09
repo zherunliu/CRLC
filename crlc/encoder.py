@@ -1,9 +1,3 @@
-"""
-CRLC 编码器网络模块
-实现状态编码器、动作编码器和联合编码器
-对应论文第3.2.1节：状态-动作联合编码器设计
-"""
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

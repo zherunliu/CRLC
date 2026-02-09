@@ -1,25 +1,8 @@
-"""
-CRLC 分布建模模块
-实现表征空间的高斯分布建模和距离计算
-对应论文第3.2.3节：表征空间的分布建模
-"""
-
 import torch
-import torch.nn as nn
 import numpy as np
-from typing import Tuple, Optional
 
 
 class RepresentationDistribution:
-    """
-    表征空间的高斯分布建模
-
-    对应公式:
-    - 均值: μ_D = (1/|D|) Σ z_φ(s,a)
-    - 协方差: Σ_D = (1/|D|) Σ (z_φ(s,a) - μ_D)(z_φ(s,a) - μ_D)^T
-    - 马氏距离: d_M(z) = √((z - μ_D)^T Σ_D^{-1} (z - μ_D))
-    """
-
     def __init__(
         self,
         representation_dim: int,

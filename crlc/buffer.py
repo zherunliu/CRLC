@@ -1,19 +1,9 @@
-"""
-CRLC 离线经验回放缓冲区
-用于加载和管理 D4RL 数据集
-"""
-
 import numpy as np
 import torch
-from typing import Tuple, Dict, Optional
+from typing import Tuple
 
 
 class OfflineReplayBuffer:
-    """
-    离线经验回放缓冲区
-    用于加载和采样 D4RL 离线数据集
-    """
-
     def __init__(
         self,
         state_dim: int,
@@ -44,7 +34,6 @@ class OfflineReplayBuffer:
         next_state: np.ndarray,
         done: bool,
     ):
-        """添加单个转移"""
         self.states[self.ptr] = state
         self.actions[self.ptr] = action
         self.rewards[self.ptr] = reward
@@ -62,7 +51,6 @@ class OfflineReplayBuffer:
         next_states: np.ndarray,
         dones: np.ndarray,
     ):
-        """批量添加转移"""
         batch_size = len(states)
 
         if self.ptr + batch_size <= self.max_size:
@@ -92,8 +80,6 @@ class OfflineReplayBuffer:
 
     def sample(self, batch_size: int) -> Tuple[torch.Tensor, ...]:
         """
-        随机采样一个批次
-
         Returns:
             states: [batch_size, state_dim]
             actions: [batch_size, action_dim]
@@ -112,7 +98,6 @@ class OfflineReplayBuffer:
         )
 
     def get_all_data(self) -> Tuple[np.ndarray, ...]:
-        """获取所有数据"""
         return (
             self.states[: self.size].copy(),
             self.actions[: self.size].copy(),
@@ -123,16 +108,6 @@ class OfflineReplayBuffer:
 
     @classmethod
     def from_d4rl(cls, env_name: str, device: str = "cuda") -> "OfflineReplayBuffer":
-        """
-        从 D4RL 数据集加载
-
-        Args:
-            env_name: D4RL 环境名称，如 "antmaze-medium-diverse-v2"
-            device: 计算设备
-
-        Returns:
-            buffer: 填充好的离线缓冲区
-        """
         import gym
         import d4rl
 
@@ -164,7 +139,7 @@ class OfflineReplayBuffer:
 
 
 if __name__ == "__main__":
-    # 简单测试（不需要 D4RL）
+    # 简单测试（without D4RL）
     buffer = OfflineReplayBuffer(
         state_dim=10, action_dim=4, max_size=1000, device="cpu"
     )

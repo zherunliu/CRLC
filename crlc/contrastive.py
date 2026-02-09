@@ -1,28 +1,14 @@
-"""
-CRLC 对比学习模块
-实现 InfoNCE 损失和轨迹感知的对比学习
-对应论文第3.2.2节：基于轨迹感知的对比损失
-"""
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from typing import Tuple, Optional, List
+from typing import Tuple, List
+
 # from encoder import JointEncoder # for mini test
 from .encoder import JointEncoder
 
 
 class InfoNCELoss(nn.Module):
-    """
-    InfoNCE 损失函数
-
-    对应公式:
-    L_contrast = -E[log(exp(sim(z_i, z_i^+)/τ) / Σ_j exp(sim(z_i, z_j)/τ))]
-
-    其中 sim(z_i, z_j) = z_i^T z_j (使用L2归一化后的余弦相似度)
-    """
-
     def __init__(self, temperature: float = 0.1):
         super().__init__()
         self.temperature = temperature
