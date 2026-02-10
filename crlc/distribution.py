@@ -69,7 +69,7 @@ class RepresentationDistribution:
         )
 
         # 计算精度矩阵（协方差逆矩阵）
-        self.precision = torch.linalg.inv(self.covariance)
+        self.precision = torch.inverse(self.covariance)
 
         # 计算训练集上的马氏距离并确定阈值
         self._compute_threshold(representations, batch_size)

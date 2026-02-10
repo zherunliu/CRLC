@@ -1,8 +1,6 @@
 # Contrastive Representation Learning for Conservative Offline RL
 
-## quick start
-
-### environment setup
+## environment setup
 
 ```bash
 conda create -n crlc python=3.9
@@ -19,9 +17,19 @@ export LD_LIBRARY_PATH=$MUJOCO_DIR/bin:$LD_LIBRARY_PATH
 pip install git+https://github.com/Farama-Foundation/d4rl@master#egg=d4rl
 ```
 
-### mini-test
+## mini-test
 
 ```bash
 # -m module
 python -m envs.point_maze
+```
+
+## screen
+
+```bash
+screen -S session-name
+
+screen -ls
+
+screen (-d) -r session-name
 ```
