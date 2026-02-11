@@ -2,10 +2,13 @@
 实验1: D4RL Antmaze 基准测试
 
 运行方式:
-    python experiments/exp1_antmaze_benchmark.py --env antmaze-medium-diverse-v2 --seed 0
+    python experiments/exp1_antmaze_benchmark.py --env antmaze-medium-diverse-v2 --seed 42
 
-批量运行:
-    python experiments/exp1_antmaze_benchmark.py --run_all --seeds 0 1 2
+批量运行所有任务:
+    python experiments/exp1_antmaze_benchmark.py --run_all
+
+汇总结果:
+    python experiments/exp1_antmaze_benchmark.py --aggregate
 """
 
 import os
@@ -129,8 +132,8 @@ def aggregate_results(save_dir: str = "./results/antmaze"):
 def main():
     parser = argparse.ArgumentParser(description="Antmaze Benchmark Experiments")
     parser.add_argument("--env", type=str, default="antmaze-medium-diverse-v2")
-    parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--seeds", nargs="+", type=int, default=[0, 1, 2])
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--seeds", nargs="+", type=int, default=[42])
     parser.add_argument("--run_all", action="store_true", help="Run all tasks")
     parser.add_argument("--aggregate", action="store_true", help="Aggregate results")
     parser.add_argument("--contrastive_steps", type=int, default=50000)

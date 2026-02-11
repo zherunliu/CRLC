@@ -376,14 +376,13 @@ class CRLC_SAC:
         # 对于随机动作
         random_penalty_weights = self._compute_adaptive_penalty(states, random_actions)
 
-        # 对于策略动作 (使用平均权重)
-        policy_penalty_weights_list = []
-        for i in range(num_policy_samples):
-            w = self._compute_adaptive_penalty(states, policy_actions[:, i])
-            policy_penalty_weights_list.append(w)
-        policy_penalty_weights = torch.stack(
-            policy_penalty_weights_list, dim=1
-        ).squeeze(-1)  # [batch, num_samples]
+        # 对于策略动作 - 批量计算（避免循环）
+        policy_penalty_weights = self._compute_adaptive_penalty(
+            states_flat, policy_actions_flat
+        )
+        policy_penalty_weights = policy_penalty_weights.reshape(
+            batch_size, num_policy_samples
+        )
 
         # CQL 损失：对 OOD 动作施加惩罚
         # logsumexp 计算 soft maximum

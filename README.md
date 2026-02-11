@@ -27,6 +27,7 @@ python -m envs.point_maze
 ## screen
 
 ```bash
+# -U for UTF-8 support
 screen -S session-name
 
 screen -ls

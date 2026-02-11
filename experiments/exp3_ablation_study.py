@@ -9,7 +9,10 @@
 5. Fixed β_min: 固定使用最小惩罚
 
 运行方式:
-    python experiments/exp3_ablation_study.py --env antmaze-medium-diverse-v2 --seeds 0 1 2
+    python experiments/exp3_ablation_study.py --env antmaze-medium-diverse-v2
+
+仅绘图（使用已有结果）:
+    python experiments/exp3_ablation_study.py --plot_only
 """
 
 import os
@@ -201,7 +204,7 @@ def aggregate_and_plot(
 def main():
     parser = argparse.ArgumentParser(description="Ablation Study Experiments")
     parser.add_argument("--env", type=str, default="antmaze-medium-diverse-v2")
-    parser.add_argument("--seeds", nargs="+", type=int, default=[0, 1, 2])
+    parser.add_argument("--seeds", nargs="+", type=int, default=[42])
     parser.add_argument("--policy_steps", type=int, default=500000)
     parser.add_argument("--save_dir", type=str, default="./results/ablation")
     parser.add_argument("--plot_only", action="store_true")

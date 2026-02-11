@@ -1,3 +1,8 @@
+"""2D Point 迷宫环境
+
+用于可视化实验的简单 2D 导航环境。
+"""
+
 import numpy as np
 import gym
 from gym import spaces
@@ -6,13 +11,13 @@ from typing import Tuple, Dict, Optional
 
 class PointMaze2D(gym.Env):
     """
-    2D Point Robot Maze Navigation Environment
+    2D Point 机器人迷宫导航环境
 
-    State space: [x, y] position coordinates
-    Action space: [dx, dy] movement vector
-    Goal: Navigate from start to goal position
+    状态空间: [x, y] 位置坐标
+    动作空间: [dx, dy] 移动向量
+    目标: 从起点导航到终点
 
-    Maze layout:
+    迷宫布局:
     +-----------+
     |  S        |
     |   ####    |
@@ -21,9 +26,9 @@ class PointMaze2D(gym.Env):
     |        G  |
     +-----------+
 
-    S: Start region
-    G: Goal region
-    #: Obstacle
+    S: 起点区域
+    G: 目标区域
+    #: 障碍物
     """
 
     def __init__(
@@ -42,53 +47,53 @@ class PointMaze2D(gym.Env):
         self.action_scale = action_scale
         self.sparse_reward = sparse_reward
 
-        # State and action space
+        # 状态和动作空间
         self.observation_space = spaces.Box(
             low=-maze_size, high=maze_size, shape=(2,), dtype=np.float32
         )
         self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float32)
 
-        # Start and goal positions
+        # 起点和目标位置
         self.start_pos = np.array([-4.0, 4.0])
         self.goal_pos = np.array([4.0, -4.0])
 
-        # Obstacle definitions (rectangle: [x_min, x_max, y_min, y_max])
+        # 障碍物定义（矩形: [x_min, x_max, y_min, y_max]）
         self.obstacles = [
-            [-2.0, 2.0, -2.0, 2.0],  # Central obstacle
+            [-2.0, 2.0, -2.0, 2.0],  # 中心障碍物
         ]
 
-        # State
+        # 状态
         self.pos = None
         self.step_count = 0
 
     def reset(self, seed=None) -> Tuple[np.ndarray, Dict]:
-        """Reset environment"""
+        """重置环境"""
         if seed is not None:
             np.random.seed(seed)
 
-        # Random initialization near start position
+        # 在起点附近随机初始化
         self.pos = self.start_pos + np.random.uniform(-0.5, 0.5, 2)
         self.step_count = 0
 
         return self.pos.copy().astype(np.float32), {}
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, bool, Dict]:
-        """Execute action"""
+        """执行动作"""
         action = np.clip(action, -1.0, 1.0)
 
-        # Compute new position
+        # 计算新位置
         new_pos = self.pos + action * self.action_scale
 
-        # Boundary check
+        # 边界检查
         new_pos = np.clip(new_pos, -self.maze_size, self.maze_size)
 
-        # Obstacle collision check
+        # 障碍物碰撞检查
         if not self._check_collision(new_pos):
             self.pos = new_pos
 
         self.step_count += 1
 
-        # Compute reward
+        # 计算奖励
         dist_to_goal = np.linalg.norm(self.pos - self.goal_pos)
         reached_goal = dist_to_goal < self.goal_radius
 
@@ -97,7 +102,7 @@ class PointMaze2D(gym.Env):
         else:
             reward = -dist_to_goal / 10.0 + (1.0 if reached_goal else 0.0)
 
-        # Termination condition
+        # 终止条件
         terminated = reached_goal
         truncated = self.step_count >= self.max_steps
 
@@ -109,7 +114,7 @@ class PointMaze2D(gym.Env):
         return self.pos.copy().astype(np.float32), reward, terminated, truncated, info
 
     def _check_collision(self, pos: np.ndarray) -> bool:
-        """Check collision with obstacles"""
+        """检查与障碍物的碰撞"""
         for obs in self.obstacles:
             x_min, x_max, y_min, y_max = obs
             if x_min <= pos[0] <= x_max and y_min <= pos[1] <= y_max:
@@ -117,17 +122,17 @@ class PointMaze2D(gym.Env):
         return False
 
     def render(self, mode="rgb_array"):
-        """Render environment (return image array)"""
+        """渲染环境（返回图像数组）"""
         import matplotlib.pyplot as plt
         from matplotlib.patches import Rectangle, Circle
 
         fig, ax = plt.subplots(1, 1, figsize=(6, 6))
 
-        # Draw boundary
+        # 绘制边界
         ax.set_xlim(-self.maze_size, self.maze_size)
         ax.set_ylim(-self.maze_size, self.maze_size)
 
-        # Draw obstacles
+        # 绘制障碍物
         for obs in self.obstacles:
             x_min, x_max, y_min, y_max = obs
             rect = Rectangle(
@@ -139,17 +144,17 @@ class PointMaze2D(gym.Env):
             )
             ax.add_patch(rect)
 
-        # Draw goal
+        # 绘制目标
         goal_circle = Circle(
             self.goal_pos, self.goal_radius, facecolor="green", alpha=0.5, label="Goal"
         )
         ax.add_patch(goal_circle)
 
-        # Draw current position
+        # 绘制当前位置
         if self.pos is not None:
             ax.plot(self.pos[0], self.pos[1], "bo", markersize=10, label="Agent")
 
-        # Draw start
+        # 绘制起点
         ax.plot(
             self.start_pos[0], self.start_pos[1], "r^", markersize=10, label="Start"
         )
@@ -158,7 +163,7 @@ class PointMaze2D(gym.Env):
         ax.legend()
         ax.grid(True, alpha=0.3)
 
-        # Convert to array
+        # 转换为数组
         fig.canvas.draw()
         image = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
         image = image.reshape(fig.canvas.get_width_height()[::-1] + (3,))
@@ -171,18 +176,18 @@ def generate_offline_dataset(
     env: PointMaze2D, num_trajectories: int = 100, policy_type: str = "mixed"
 ) -> Dict[str, np.ndarray]:
     """
-    Generate offline dataset
+    生成离线数据集
 
     Args:
-        env: Environment instance
-        num_trajectories: Number of trajectories
-        policy_type: Policy type
-            - 'random': Random policy
-            - 'expert': Expert policy (move toward goal)
-            - 'mixed': Mixed policy
+        env: 环境实例
+        num_trajectories: 轨迹数量
+        policy_type: 策略类型
+            - 'random': 随机策略
+            - 'expert': 专家策略（向目标移动）
+            - 'mixed': 混合策略
 
     Returns:
-        dataset: Dictionary containing observations, actions, rewards, next_observations, terminals
+        dataset: 包含 observations, actions, rewards, next_observations, terminals 的字典
     """
     observations = []
     actions = []
@@ -195,17 +200,17 @@ def generate_offline_dataset(
         done = False
 
         while not done:
-            # Select action
+            # 选择动作
             if policy_type == "random":
                 action = env.action_space.sample()
             elif policy_type == "expert":
-                # Move toward goal with slight noise
+                # 向目标移动，添加轻微噪声
                 direction = env.goal_pos - obs
                 direction = direction / (np.linalg.norm(direction) + 1e-8)
                 action = direction + np.random.randn(2) * 0.1
                 action = np.clip(action, -1, 1)
             elif policy_type == "mixed":
-                # 50% random, 50% expert
+                # 50% 随机, 50% 专家
                 if np.random.rand() < 0.5:
                     action = env.action_space.sample()
                 else:
@@ -228,7 +233,7 @@ def generate_offline_dataset(
             obs = next_obs
 
         if (traj_idx + 1) % 20 == 0:
-            print(f"Generated trajectory {traj_idx + 1}/{num_trajectories}")
+            print(f"已生成轨迹 {traj_idx + 1}/{num_trajectories}")
 
     return {
         "observations": np.array(observations, dtype=np.float32),
@@ -242,13 +247,13 @@ def generate_offline_dataset(
 def visualize_dataset(
     dataset: Dict[str, np.ndarray], env: PointMaze2D, save_path: Optional[str] = None
 ):
-    """Visualize dataset distribution"""
+    """可视化数据集分布"""
     import matplotlib.pyplot as plt
     from matplotlib.patches import Rectangle, Circle
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
-    # State distribution
+    # 状态分布
     ax = axes[0]
     ax.scatter(
         dataset["observations"][:, 0],
@@ -259,7 +264,7 @@ def visualize_dataset(
         s=1,
     )
 
-    # Draw obstacles
+    # 绘制障碍物
     for obs in env.obstacles:
         x_min, x_max, y_min, y_max = obs
         rect = Rectangle(
@@ -272,7 +277,7 @@ def visualize_dataset(
         )
         ax.add_patch(rect)
 
-    # Draw goal
+    # 绘制目标
     goal_circle = Circle(env.goal_pos, env.goal_radius, facecolor="green", alpha=0.5)
     ax.add_patch(goal_circle)
 
@@ -283,7 +288,7 @@ def visualize_dataset(
     ax.set_title("State Space Distribution")
     ax.set_aspect("equal")
 
-    # Action distribution
+    # 动作分布
     ax = axes[1]
     ax.scatter(dataset["actions"][:, 0], dataset["actions"][:, 1], alpha=0.1, s=1)
     ax.set_xlim(-1.5, 1.5)
@@ -297,35 +302,35 @@ def visualize_dataset(
 
     if save_path:
         plt.savefig(save_path, dpi=150)
-        print(f"Figure saved to {save_path}")
+        print(f"图片已保存至 {save_path}")
 
     plt.show()
 
 
 if __name__ == "__main__":
-    # Test environment
+    # 测试环境
     env = PointMaze2D()
 
     obs, _ = env.reset()
-    print(f"Initial state: {obs}")
+    print(f"初始状态: {obs}")
 
-    # Execute a few steps
+    # 执行几步
     for i in range(5):
         action = env.action_space.sample()
         obs, reward, terminated, truncated, info = env.step(action)
         print(
-            f"Step {i + 1}: state={obs}, reward={reward}, dist={info['dist_to_goal']:.2f}"
+            f"步骤 {i + 1}: 状态={obs}, 奖励={reward}, 距离={info['dist_to_goal']:.2f}"
         )
 
-    # Generate dataset
-    print("\nGenerating offline dataset...")
+    # 生成数据集
+    print("\n正在生成离线数据集...")
     dataset = generate_offline_dataset(env, num_trajectories=20, policy_type="mixed")
-    print(f"Dataset size: {len(dataset['observations'])}")
+    print(f"数据集大小: {len(dataset['observations'])}")
 
-    # Visualize
+    # 可视化
     try:
         visualize_dataset(dataset, env, save_path="./point_maze_dataset.png")
     except Exception as e:
-        print(f"Visualization skipped: {e}")
+        print(f"跳过可视化: {e}")
 
-    print("2D Point environment test passed!")
+    print("2D Point 环境测试通过！")

@@ -8,6 +8,9 @@
 
 运行方式:
     python experiments/exp4_2d_visualization.py
+
+快速测试（减少训练步数）:
+    python experiments/exp4_2d_visualization.py --contrastive_steps 5000
 """
 
 import os
@@ -40,7 +43,7 @@ def run_2d_experiment(
     os.makedirs(save_dir, exist_ok=True)
 
     # 创建环境和数据集
-    print("[1/5] Creating environment and dataset...")
+    print("[1/5] 创建环境和数据集...")
     env = PointMaze2D()
     dataset = generate_offline_dataset(
         env, num_trajectories=n_trajectories, policy_type="mixed"
@@ -50,7 +53,7 @@ def run_2d_experiment(
     action_dim = 2
 
     # 创建编码器
-    print("[2/5] Training contrastive encoder...")
+    print("[2/5] 训练对比编码器...")
     encoder = JointEncoder(
         state_dim=state_dim,
         action_dim=action_dim,
@@ -84,7 +87,7 @@ def run_2d_experiment(
     )
 
     # 构建分布
-    print("[3/5] Building representation distribution...")
+    print("[3/5] 构建表征分布...")
     distribution = RepresentationDistribution(representation_dim=32, device=device)
 
     encoder.eval()
@@ -96,7 +99,7 @@ def run_2d_experiment(
     distribution.fit(all_repr)
 
     # 生成可视化
-    print("[4/5] Generating visualizations...")
+    print("[4/5] 生成可视化图表...")
 
     # 图1: 数据集分布
     plot_dataset_distribution(dataset, env, save_dir)
@@ -110,7 +113,7 @@ def run_2d_experiment(
     # 图4: 惩罚权重分布对比
     plot_penalty_distribution(encoder, distribution, dataset, save_dir, device)
 
-    print(f"[5/5] All visualizations saved to {save_dir}")
+    print(f"[5/5] 所有可视化图表已保存至 {save_dir}")
 
 
 def plot_dataset_distribution(dataset, env, save_dir):
@@ -162,7 +165,7 @@ def plot_dataset_distribution(dataset, env, save_dir):
     save_path = os.path.join(save_dir, "dataset_distribution.pdf")
     plt.savefig(save_path, dpi=300, bbox_inches="tight", format="pdf")
     plt.savefig(save_path.replace(".pdf", ".png"), dpi=300, bbox_inches="tight")
-    print(f"Saved: {save_path}")
+    print(f"已保存: {save_path}")
     plt.close()
 
 
@@ -226,7 +229,7 @@ def plot_representation_space(encoder, dataset, distribution, env, save_dir, dev
     save_path = os.path.join(save_dir, "representation_space.pdf")
     plt.savefig(save_path, dpi=300, bbox_inches="tight", format="pdf")
     plt.savefig(save_path.replace(".pdf", ".png"), dpi=300, bbox_inches="tight")
-    print(f"Saved: {save_path}")
+    print(f"已保存: {save_path}")
     plt.close()
 
 
@@ -295,7 +298,7 @@ def plot_penalty_heatmap(encoder, distribution, env, save_dir, device):
     save_path = os.path.join(save_dir, "penalty_heatmap.pdf")
     plt.savefig(save_path, dpi=300, bbox_inches="tight", format="pdf")
     plt.savefig(save_path.replace(".pdf", ".png"), dpi=300, bbox_inches="tight")
-    print(f"Saved: {save_path}")
+    print(f"已保存: {save_path}")
     plt.close()
 
 
@@ -377,18 +380,22 @@ def plot_penalty_distribution(encoder, distribution, dataset, save_dir, device):
     save_path = os.path.join(save_dir, "penalty_distribution.pdf")
     plt.savefig(save_path, dpi=300, bbox_inches="tight", format="pdf")
     plt.savefig(save_path.replace(".pdf", ".png"), dpi=300, bbox_inches="tight")
-    print(f"Saved: {save_path}")
+    print(f"已保存: {save_path}")
     plt.close()
 
 
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description="2D Visualization Experiments")
-    parser.add_argument("--n_trajectories", type=int, default=100)
-    parser.add_argument("--contrastive_steps", type=int, default=10000)
-    parser.add_argument("--save_dir", type=str, default="./results/2d_visualization")
-    parser.add_argument("--device", type=str, default="cuda")
+    parser = argparse.ArgumentParser(description="2D 可视化实验")
+    parser.add_argument("--n_trajectories", type=int, default=100, help="轨迹数量")
+    parser.add_argument(
+        "--contrastive_steps", type=int, default=10000, help="对比学习步数"
+    )
+    parser.add_argument(
+        "--save_dir", type=str, default="./results/2d_visualization", help="保存目录"
+    )
+    parser.add_argument("--device", type=str, default="cuda", help="计算设备")
     args = parser.parse_args()
 
     run_2d_experiment(

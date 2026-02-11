@@ -3,8 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from typing import Tuple, List
-
-# from encoder import JointEncoder # for mini test
 from .encoder import JointEncoder
 
 
@@ -107,6 +105,8 @@ class TrajectoryBuffer:
                     current_traj += 1
 
         self.num_trajectories = len(self.trajectory_ends)
+        self.trajectory_starts = np.array(self.trajectory_starts)
+        self.trajectory_ends = np.array(self.trajectory_ends)
         print(f"构建了 {self.num_trajectories} 条轨迹")
 
     def sample_batch(
@@ -123,67 +123,65 @@ class TrajectoryBuffer:
             num_negatives: 每个锚点的负样本数量
 
         Returns:
-            anchor_states: [batch_size, state_dim]
-            anchor_actions: [batch_size, action_dim]
-            positive_states: [batch_size, state_dim]
-            positive_actions: [batch_size, action_dim]
-            negative_states: [batch_size, num_negatives, state_dim]
-            negative_actions: [batch_size, num_negatives, action_dim]
+            anchor_states, anchor_actions, positive_states, positive_actions,
+            negative_states, negative_actions
         """
         # 随机采样锚点索引
         anchor_indices = np.random.randint(0, self.size, batch_size)
 
-        # 初始化数组
-        state_dim = self.states.shape[1]
-        action_dim = self.actions.shape[1]
+        # 获取轨迹信息（向量化）
+        traj_ids = self.step_to_trajectory[anchor_indices]
+        traj_starts = self.trajectory_starts[traj_ids]
+        traj_ends = self.trajectory_ends[traj_ids]
 
+        # 计算正样本窗口（向量化）
+        window_starts = np.maximum(traj_starts, anchor_indices - self.trajectory_window)
+        window_ends = np.minimum(traj_ends, anchor_indices + self.trajectory_window)
+
+        # 采样正样本
         positive_indices = np.zeros(batch_size, dtype=np.int64)
-        negative_indices = np.zeros((batch_size, num_negatives), dtype=np.int64)
-
-        for i, anchor_idx in enumerate(anchor_indices):
-            # 获取锚点所在轨迹
-            traj_id = self.step_to_trajectory[anchor_idx]
-            traj_start = self.trajectory_starts[traj_id]
-            traj_end = self.trajectory_ends[traj_id]
-
-            # 采样正样本（同一轨迹内，窗口范围内）
-            window_start = max(traj_start, anchor_idx - self.trajectory_window)
-            window_end = min(traj_end, anchor_idx + self.trajectory_window)
-
-            # 排除锚点自身
-            valid_positive = list(range(window_start, anchor_idx)) + list(
-                range(anchor_idx + 1, window_end + 1)
+        for i in range(batch_size):
+            valid_range = list(range(window_starts[i], anchor_indices[i])) + list(
+                range(anchor_indices[i] + 1, window_ends[i] + 1)
             )
-            if len(valid_positive) == 0:
-                valid_positive = [anchor_idx]  # 如果没有有效正样本，使用自身
-
-            positive_indices[i] = np.random.choice(valid_positive)
-
-            # 采样负样本（其他轨迹）
-            # 获取当前轨迹外的所有索引
-            current_traj_indices = set(range(traj_start, traj_end + 1))
-            all_indices = set(range(self.size))
-            other_indices = list(all_indices - current_traj_indices)
-
-            if len(other_indices) >= num_negatives:
-                negative_indices[i] = np.random.choice(
-                    other_indices, num_negatives, replace=False
-                )
+            if len(valid_range) == 0:
+                positive_indices[i] = anchor_indices[i]
             else:
-                # 如果其他轨迹样本不够，允许重复采样
-                negative_indices[i] = np.random.choice(
-                    other_indices, num_negatives, replace=True
-                )
+                positive_indices[i] = valid_range[np.random.randint(len(valid_range))]
+
+        # 采样负样本（快速向量化）
+        # 多采样一些，然后过滤掉同轨迹的
+        negative_indices = np.random.randint(
+            0, self.size, (batch_size, num_negatives * 2)
+        )
+        neg_traj_ids = self.step_to_trajectory[negative_indices]
+        valid_mask = neg_traj_ids != traj_ids[:, None]
+
+        # 取每行前 num_negatives 个有效负样本
+        final_neg_indices = np.zeros((batch_size, num_negatives), dtype=np.int64)
+        for i in range(batch_size):
+            valid_negs = negative_indices[i][valid_mask[i]]
+            if len(valid_negs) >= num_negatives:
+                final_neg_indices[i] = valid_negs[:num_negatives]
+            else:
+                # 不够的话用有效的填充
+                final_neg_indices[i, : len(valid_negs)] = valid_negs
+                if len(valid_negs) > 0:
+                    final_neg_indices[i, len(valid_negs) :] = np.random.choice(
+                        valid_negs, num_negatives - len(valid_negs), replace=True
+                    )
+                else:
+                    final_neg_indices[i] = np.random.randint(
+                        0, self.size, num_negatives
+                    )
 
         # 提取数据
         anchor_states = self.states[anchor_indices]
         anchor_actions = self.actions[anchor_indices]
         positive_states = self.states[positive_indices]
         positive_actions = self.actions[positive_indices]
-        negative_states = self.states[negative_indices]  # [batch, num_neg, state_dim]
-        negative_actions = self.actions[
-            negative_indices
-        ]  # [batch, num_neg, action_dim]
+        negative_states = self.states[final_neg_indices]
+        negative_actions = self.actions[final_neg_indices]
 
         return (
             anchor_states,
