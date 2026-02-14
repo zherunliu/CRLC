@@ -1,0 +1,44 @@
+{
+  "antmaze-umaze-v2": {
+    "return_mean": 1.0,
+    "return_std": 0.0,
+    "success_mean": 100.0,
+    "success_std": 0.0,
+    "n_seeds": 1
+  },
+  "antmaze-umaze-diverse-v2": {
+    "return_mean": 0.85,
+    "return_std": 0.0,
+    "success_mean": 85.0,
+    "success_std": 0.0,
+    "n_seeds": 1
+  },
+  "antmaze-medium-play-v2": {
+    "return_mean": 0.05,
+    "return_std": 0.0,
+    "success_mean": 0.0,
+    "success_std": 0.0,
+    "n_seeds": 1
+  },
+  "antmaze-medium-diverse-v2": {
+    "return_mean": 0.1,
+    "return_std": 0.0,
+    "success_mean": 0.0,
+    "success_std": 0.0,
+    "n_seeds": 1
+  },
+  "antmaze-large-play-v2": {
+    "return_mean": 0.05,
+    "return_std": 0.0,
+    "success_mean": 5.0,
+    "success_std": 0.0,
+    "n_seeds": 1
+  },
+  "antmaze-large-diverse-v2": {
+    "return_mean": 0.1,
+    "return_std": 0.0,
+    "success_mean": 0.0,
+    "success_std": 0.0,
+    "n_seeds": 1
+  }
+}

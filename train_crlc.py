@@ -9,7 +9,7 @@ import argparse
 import numpy as np
 import torch
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict
 import json
 
 # 添加项目路径

@@ -1,0 +1,8 @@
+{
+  "env_name": "antmaze-large-play-v2",
+  "seed": 42,
+  "final_return": 0.0,
+  "best_return": 0.05,
+  "final_success": 0.0,
+  "best_success": 0.05
+}

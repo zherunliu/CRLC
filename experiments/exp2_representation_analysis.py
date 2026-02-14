@@ -7,7 +7,7 @@
 - t-SNE表征可视化
 
 运行方式:
-    python experiments/exp2_representation_analysis.py --checkpoint ./results/antmaze/antmaze-medium-diverse-v2/seed_0/checkpoints
+    python experiments/exp2_representation_analysis.py --checkpoint ./results/antmaze/antmaze-medium-diverse-v2/seed_42/checkpoints
 """
 
 import os

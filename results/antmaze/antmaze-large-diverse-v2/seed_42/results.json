@@ -1,0 +1,8 @@
+{
+  "env_name": "antmaze-large-diverse-v2",
+  "seed": 42,
+  "final_return": 0.0,
+  "best_return": 0.1,
+  "final_success": 0.0,
+  "best_success": 0.0
+}

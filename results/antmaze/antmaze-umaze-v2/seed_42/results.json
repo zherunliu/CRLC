@@ -1,0 +1,8 @@
+{
+  "env_name": "antmaze-umaze-v2",
+  "seed": 42,
+  "final_return": 0.9,
+  "best_return": 1.0,
+  "final_success": 0.9,
+  "best_success": 1.0
+}

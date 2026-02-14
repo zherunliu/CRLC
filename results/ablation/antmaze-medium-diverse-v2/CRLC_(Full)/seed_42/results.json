@@ -1,0 +1,12 @@
+{
+  "env_name": "antmaze-medium-diverse-v2",
+  "seed": 42,
+  "config_name": "CRLC (Full)",
+  "config": {
+    "use_contrastive": true,
+    "use_adaptive": true,
+    "fixed_beta": null
+  },
+  "final_return": 0.0,
+  "best_return": 0.1
+}
