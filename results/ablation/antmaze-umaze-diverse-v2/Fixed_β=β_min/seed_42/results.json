@@ -1,0 +1,12 @@
+{
+  "env_name": "antmaze-umaze-diverse-v2",
+  "seed": 42,
+  "config_name": "Fixed \u03b2=\u03b2_min",
+  "config": {
+    "use_contrastive": true,
+    "use_adaptive": false,
+    "fixed_beta": 0.1
+  },
+  "final_return": 0.3,
+  "best_return": 0.6
+}

@@ -1,0 +1,9 @@
+{
+  "env_name": "antmaze-umaze-diverse-v2",
+  "seed": 42,
+  "representation_dim": 128,
+  "contrastive_steps": 0,
+  "policy_steps": 500000,
+  "beta_min": 0.1,
+  "beta_max": 5.0
+}
